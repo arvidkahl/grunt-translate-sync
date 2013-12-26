@@ -1,0 +1,43 @@
+{
+  "name": "grunt-translate-sync",
+  "description": "Synchronizes JSON translation files for angular-translate during development by moving new keys to out-of-date files.",
+  "version": "0.1.0",
+  "homepage": "https://github.com/arvidkahl/grunt-translate-sync",
+  "author": {
+    "name": "Arvid Kahl",
+    "email": "mail@arvidkahl.de",
+    "url": "http://www.arvidkahl.de"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/arvidkahl/grunt-translate-sync.git"
+  },
+  "bugs": {
+    "url": "https://github.com/arvidkahl/grunt-translate-sync/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/arvidkahl/grunt-translate-sync/blob/master/LICENSE-MIT"
+    }
+  ],
+  "main": "Gruntfile.js",
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "scripts": {
+    "test": "grunt test"
+  },
+  "devDependencies": {
+    "grunt-contrib-jshint": "~0.6.0",
+    "grunt-contrib-clean": "~0.4.0",
+    "grunt-contrib-nodeunit": "~0.2.0",
+    "grunt": "~0.4.2"
+  },
+  "peerDependencies": {
+    "grunt": "~0.4.2"
+  },
+  "keywords": [
+    "gruntplugin"
+  ]
+}
