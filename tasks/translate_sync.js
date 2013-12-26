@@ -16,35 +16,78 @@ module.exports = function(grunt) {
   grunt.registerMultiTask('translate_sync', 'Synchronizes JSON translation files for angular-translate during development by moving new keys to out-of-date files.', function() {
     // Merge task-specific and/or target-specific options with these defaults.
     var options = this.options({
-      punctuation: '.',
-      separator: ', '
+       indent : 2
     });
+
+    var done = this.async();
+
+    var sourceFile = this.data.source;
+    var targetFiles = this.data.targets;
+
+    if (sourceFile==null) {
+      grunt.log.warn('Source option not found.');
+      return false;
+    }
+
+    if (!grunt.file.exists(sourceFile)) {
+      grunt.log.warn('Source file "' + sourceFile + '" not found.');
+      return false;
+    }
+
+    var sourceJSON = JSON.parse(grunt.file.read(sourceFile));
+    grunt.log.writeln('Using source file "' + sourceFile);
+
+
+    if (targetFiles==null) {
+      grunt.log.warn('Targets option not found');
+      return false;
+    }
+    var targetCount = targetFiles.length;
+    if (targetCount===0) {
+      grunt.log.warn('No targets specified');
+      return false;
+    }
+
+    var remainingCount = targetCount;
+
+
+
+
 
     // Iterate over all specified file groups.
-    this.files.forEach(function(f) {
-      // Concat specified files.
-      var src = f.src.filter(function(filepath) {
-        // Warn on and remove invalid source files (if nonull was set).
-        if (!grunt.file.exists(filepath)) {
-          grunt.log.warn('Source file "' + filepath + '" not found.');
-          return false;
-        } else {
-          return true;
-        }
-      }).map(function(filepath) {
+    targetFiles.forEach(function(filepath) {
+
+      // Warn on and remove invalid source files (if nonull was set).
+      if (!grunt.file.exists(filepath)) {
+        grunt.log.warn('Target file "' + filepath + '" not found.');
+        return false;
+      } else {
         // Read file source.
-        return grunt.file.read(filepath);
-      }).join(grunt.util.normalizelf(options.separator));
+        var targetContent = grunt.file.read(filepath);
+        var targetJSON = JSON.parse(targetContent);
+        var changedItems = 0;
+        var  key, value;
+        for (key in sourceJSON) {
+          value = sourceJSON[key];
+          if (!targetJSON[key]) {
+            changedItems++;
+            targetJSON[key] = value;
+          }
+        }
 
-      // Handle options.
-      src += options.punctuation;
+        grunt.log.writeln('File "' + filepath + '" updated. '+changedItems+' items changed.');
+        grunt.file.write(filepath, JSON.stringify(targetJSON, null, options.indent));
+        if (--remainingCount===0) {
+          done();
+        }
+      }
 
-      // Write the destination file.
-      grunt.file.write(f.dest, src);
-
-      // Print a success message.
-      grunt.log.writeln('File "' + f.dest + '" created.');
     });
+
+
+    // Print a success message.
+    grunt.log.writeln('Done syncing files.');
+
   });
 
 };

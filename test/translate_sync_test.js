@@ -24,25 +24,13 @@ var grunt = require('grunt');
 
 exports.translate_sync = {
   setUp: function(done) {
-    // setup here if necessary
     done();
   },
-  default_options: function(test) {
+  simple: function(test) {
     test.expect(1);
-
-    var actual = grunt.file.read('tmp/default_options');
-    var expected = grunt.file.read('test/expected/default_options');
-    test.equal(actual, expected, 'should describe what the default behavior is.');
-
-    test.done();
-  },
-  custom_options: function(test) {
-    test.expect(1);
-
-    var actual = grunt.file.read('tmp/custom_options');
-    var expected = grunt.file.read('test/expected/custom_options');
-    test.equal(actual, expected, 'should describe what the custom option(s) behavior is.');
-
+    var actual = JSON.parse(grunt.file.read('tmp/simpleTarget'));
+    var expected = JSON.parse(grunt.file.read('test/expected/simple'));
+    test.deepEqual(Object.keys(actual).sort(), Object.keys(expected).sort(), 'should have the same keys (in any order).');
     test.done();
   },
 };
