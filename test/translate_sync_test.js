@@ -33,4 +33,11 @@ exports.translate_sync = {
     test.deepEqual(Object.keys(actual).sort(), Object.keys(expected).sort(), 'should have the same keys (in any order).');
     test.done();
   },
+  sorted: function(test) {
+    test.expect(1);
+    var actual = JSON.parse(grunt.file.read('tmp/sortedTarget'));
+    var expected = JSON.parse(grunt.file.read('test/expected/sorted'));
+    test.deepEqual(actual, expected, 'should have the same keys (in correct order).');
+    test.done();
+  },
 };

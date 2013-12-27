@@ -16,7 +16,8 @@ module.exports = function(grunt) {
   grunt.registerMultiTask('translate_sync', 'Synchronizes JSON translation files for angular-translate during development by moving new keys to out-of-date files.', function() {
     // Merge task-specific and/or target-specific options with these defaults.
     var options = this.options({
-       indent : 2
+       indent : 2,
+       keepKeyOrder : false
     });
 
     var done = this.async();
@@ -50,10 +51,6 @@ module.exports = function(grunt) {
 
     var remainingCount = targetCount;
 
-
-
-
-
     // Iterate over all specified file groups.
     targetFiles.forEach(function(filepath) {
 
@@ -66,22 +63,38 @@ module.exports = function(grunt) {
         var targetContent = grunt.file.read(filepath);
         var targetJSON = JSON.parse(targetContent);
         var changedItems = 0;
-        var  key, value;
-        for (key in sourceJSON) {
-          value = sourceJSON[key];
-          if (!targetJSON[key]) {
-            changedItems++;
-            targetJSON[key] = value;
+        var key, value, result;
+
+        if(!options.keepKeyOrder){
+
+          for (key in sourceJSON) {
+            value = sourceJSON[key];
+            if (!targetJSON[key]) {
+              changedItems++;
+              targetJSON[key] = value;
+            }
           }
+          result = targetJSON;
+        } else {
+          var newTargetJSON = {};
+          for (key in sourceJSON) {
+            value = sourceJSON[key];
+            if (!targetJSON[key]) {
+              changedItems++;
+              newTargetJSON[key] = value;
+            } else {
+              newTargetJSON[key] = targetJSON[key];
+            }
+          }
+          result = newTargetJSON;
         }
 
         grunt.log.writeln('File "' + filepath + '" updated. '+changedItems+' items changed.');
-        grunt.file.write(filepath, JSON.stringify(targetJSON, null, options.indent));
+        grunt.file.write(filepath, JSON.stringify(result, null, options.indent));
         if (--remainingCount===0) {
           done();
         }
       }
-
     });
 
 

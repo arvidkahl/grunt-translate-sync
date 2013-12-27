@@ -30,10 +30,17 @@ module.exports = function(grunt) {
 
     // Configuration to be run (and then tested).
     translate_sync: {
-      testTranslate: {
+      testTranslateSimple: {
         options: {},
         source: 'test/fixtures/simpleSource',
         targets: ['tmp/simpleTarget'],
+      },
+      testTranslateSorted: {
+        options: {
+          keepKeyOrder: true
+        },
+        source: 'test/fixtures/sortedSource',
+        targets: ['tmp/sortedTarget'],
       },
     },
 
@@ -55,6 +62,7 @@ module.exports = function(grunt) {
   // Copy fixtures for testing purposes
   grunt.registerTask('copy', 'Copy fixtures to a temp location.', function() {
     grunt.file.copy('test/fixtures/simpleTarget', 'tmp/simpleTarget');
+    grunt.file.copy('test/fixtures/sortedTarget', 'tmp/sortedTarget');
   });
 
   // Whenever the "test" task is run, first clean the "tmp" dir, copy empty target, then run this
