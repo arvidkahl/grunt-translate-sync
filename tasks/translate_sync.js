@@ -17,7 +17,7 @@ module.exports = function(grunt) {
     // Merge task-specific and/or target-specific options with these defaults.
     var options = this.options({
        indent : 2,
-       keepKeyOrder : false
+       keepKeyOrder : true
     });
 
     var done = this.async();

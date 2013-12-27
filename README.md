@@ -2,6 +2,8 @@
 
 > Synchronizes JSON translation files for angular-translate during development by moving new keys to out-of-date files.
 
+Useful for libraries like [angular-translate](https://github.com/PascalPrecht/angular-translate), where translation info is kept in multiple JSON files with identical keys.
+
 ## Getting Started
 This plugin requires Grunt `~0.4.2`
 
@@ -26,69 +28,74 @@ In your project's Gruntfile, add a section named `translate_sync` to the data ob
 grunt.initConfig({
   translate_sync: {
     options: {
-      // Task-specific options go here.
+      keepKeyOrder: Boolean
     },
-    your_target: {
-      // Target-specific file lists and/or options go here.
-    },
+    source: String,
+    targets: [String]
   },
 });
 ```
 
 ### Options
 
-#### options.separator
+#### options.keepKeyOrder
 Type: `String`
-Default value: `',  '`
+Default value: `true`
 
-A string value that is used to do something with whatever.
+A boolean value that indicates if the keys in the target files should appear in the same order as in the source file.
 
-#### options.punctuation
+#### options.indent
+Type: `String` or `Number`
+Default value: `2`
+
+A string or numeric value that is passed to JSON.stringify as the `space` parameter when writing the target files. Setting it to `null` will remove pretty-printing, anything else will pretty-pring the JSON as outlined in [the JSON.stringify documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify)
+
+#### source
 Type: `String`
-Default value: `'.'`
+Default value: `null`
 
-A string value that is used to do something else with whatever else.
+Required value of the path to the source file. All key-value pair in this file will be added to all target files unless they are already present there. Must be valid JSON.
 
-### Usage Examples
+#### targets
+Type: `[String]`
+Default value: `[]`
+
+Required array of target files that should be updated with the keys from the source file. Must not be empty. All files must be valid JSON.
+
+### Usage Example
 
 #### Default Options
-In this example, the default options are used to do something with whatever. So if the `testing` file has the content `Testing` and the `123` file had the content `1 2 3`, the generated result would be `Testing, 1 2 3.`
+In this example, a source file called `tmp/enUS.json` will be used to update the key-value pairs in `tmp/frFR` and `tmp/deDE`.
 
 ```js
 grunt.initConfig({
   translate_sync: {
-    options: {},
-    files: {
-      'dest/default_options': ['src/testing', 'src/123'],
-    },
+    source: "tmp/enUS.json",
+    targets: ["tmp/frFR.json", "tmp/deDE.json"]
   },
 });
 ```
 
 #### Custom Options
-In this example, custom options are used to do something else with whatever else. So if the `testing` file has the content `Testing` and the `123` file had the content `1 2 3`, the generated result in this case would be `Testing: 1 2 3 !!!`
+In this example, a source file called `tmp/enUS.json` will be used to update the key-value pairs in `tmp/frFR` and `tmp/deDE`, keeping the key order in the target files as they are (new keys will be added after the last key), and using a `tab` character for pretty-printing.
 
 ```js
 grunt.initConfig({
   translate_sync: {
     options: {
-      separator: ': ',
-      punctuation: ' !!!',
+      keepKeyOrder: false,
+      indent: "\t"
     },
-    files: {
-      'dest/default_options': ['src/testing', 'src/123'],
-    },
+    source: "tmp/enUS.json",
+    targets: ["tmp/frFR.json", "tmp/deDE.json"]
   },
 });
 ```
+
 
 ## Contributing
 In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
 
 ## Release History
-_(Nothing yet)_
-=======
-grunt-translate-sync
-====================
-
-Synchronizes JSON translation files for angular-translate during development by moving new keys to out-of-date files.
+0.1.0 - Initial Version, keys are added after the last key if not present in target files
+0.2.0 - keepKeyOrder option introduced, testing refined for both cases

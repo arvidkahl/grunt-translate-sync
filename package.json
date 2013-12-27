@@ -1,7 +1,7 @@
 {
   "name": "grunt-translate-sync",
   "description": "Synchronizes JSON translation files for angular-translate during development by moving new keys to out-of-date files.",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "homepage": "https://github.com/arvidkahl/grunt-translate-sync",
   "author": {
     "name": "Arvid Kahl",
