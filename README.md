@@ -2,6 +2,8 @@
 
 > Synchronizes JSON translation files for angular-translate during development by moving new keys to out-of-date files.
 
+[![Build Status](https://travis-ci.org/arvidkahl/grunt-translate-sync.png?branch=master)](https://travis-ci.org/arvidkahl/grunt-translate-sync)
+
 Useful for libraries like [angular-translate](https://github.com/PascalPrecht/angular-translate), where translation info is kept in multiple JSON files with identical keys.
 
 ## Getting Started
