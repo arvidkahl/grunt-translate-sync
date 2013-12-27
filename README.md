@@ -30,7 +30,8 @@ In your project's Gruntfile, add a section named `translate_sync` to the data ob
 grunt.initConfig({
   translate_sync: {
     options: {
-      keepKeyOrder: Boolean
+      keepKeyOrder: Boolean,
+      indent: String or Number
     },
     source: String,
     targets: [String]
@@ -100,4 +101,7 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 
 ## Release History
 0.1.0 - Initial Version, keys are added after the last key if not present in target files
+	
 0.2.0 - keepKeyOrder option introduced, testing refined for both cases
+
+0.2.1 - added travis integration
