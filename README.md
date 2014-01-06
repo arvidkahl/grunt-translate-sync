@@ -106,4 +106,4 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 
 0.2.1 - added travis integration
 
-0.3.0 - added namespace compatibility (fixes #1 )
+0.3.0 - added namespace compatibility, fixes arvidkahl/grunt-translate-sync#1
