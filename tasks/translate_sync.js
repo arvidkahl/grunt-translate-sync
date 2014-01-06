@@ -15,12 +15,47 @@ module.exports = function(grunt) {
 
   grunt.registerMultiTask('translate_sync', 'Synchronizes JSON translation files for angular-translate during development by moving new keys to out-of-date files.', function() {
     // Merge task-specific and/or target-specific options with these defaults.
+    var assureObjectEquality;
+    var changedItems = 0;
+
     var options = this.options({
        indent : 2,
        keepKeyOrder : true
     });
 
     var done = this.async();
+
+    assureObjectEquality = function(s, t) {
+      var sourceKey, sourceValue, t_, _ref;
+      if (t == null) {
+        t = {};
+      }
+      t_ = {};
+      for (sourceKey in s) {
+        sourceValue = s[sourceKey];
+        if ((_ref = typeof sourceValue) === "string" || _ref === "boolean" || _ref === "number") {
+          if (!t[sourceKey]) {
+            changedItems++;
+            t_[sourceKey] = sourceValue;
+            t[sourceKey] = sourceValue;
+          } else {
+            t_[sourceKey] = t[sourceKey];
+          }
+        } else {
+          if (!t[sourceKey]) {
+            t[sourceKey] = {};
+            t_[sourceKey] = {};
+          }
+          t[sourceKey] = assureObjectEquality(sourceValue, t[sourceKey]);
+          t_[sourceKey] = assureObjectEquality(sourceValue, t[sourceKey]);
+        }
+      }
+      if (options.keepKeyOrder) {
+        t = t_;
+      }
+      return t;
+    };
+
 
     var sourceFile = this.data.source;
     var targetFiles = this.data.targets;
@@ -62,32 +97,9 @@ module.exports = function(grunt) {
         // Read file source.
         var targetContent = grunt.file.read(filepath);
         var targetJSON = JSON.parse(targetContent);
-        var changedItems = 0;
-        var key, value, result;
+        var result;
 
-        if(!options.keepKeyOrder){
-
-          for (key in sourceJSON) {
-            value = sourceJSON[key];
-            if (!targetJSON[key]) {
-              changedItems++;
-              targetJSON[key] = value;
-            }
-          }
-          result = targetJSON;
-        } else {
-          var newTargetJSON = {};
-          for (key in sourceJSON) {
-            value = sourceJSON[key];
-            if (!targetJSON[key]) {
-              changedItems++;
-              newTargetJSON[key] = value;
-            } else {
-              newTargetJSON[key] = targetJSON[key];
-            }
-          }
-          result = newTargetJSON;
-        }
+        result = assureObjectEquality(sourceJSON, targetJSON);
 
         grunt.log.writeln('File "' + filepath + '" updated. '+changedItems+' items changed.');
         grunt.file.write(filepath, JSON.stringify(result, null, options.indent));

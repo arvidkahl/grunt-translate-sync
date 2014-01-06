@@ -42,6 +42,18 @@ module.exports = function(grunt) {
         source: 'test/fixtures/sortedSource',
         targets: ['tmp/sortedTarget'],
       },
+      testTranslateNested: {
+        options: {},
+        source: 'test/fixtures/nestedSource',
+        targets: ['tmp/nestedTarget'],
+      },
+      testTranslateNestedSorted: {
+        options: {
+          keepKeyOrder: true
+        },
+        source: 'test/fixtures/nestedSortedSource',
+        targets: ['tmp/nestedSortedTarget'],
+      },
     },
 
     // Unit tests.
@@ -63,6 +75,8 @@ module.exports = function(grunt) {
   grunt.registerTask('copy', 'Copy fixtures to a temp location.', function() {
     grunt.file.copy('test/fixtures/simpleTarget', 'tmp/simpleTarget');
     grunt.file.copy('test/fixtures/sortedTarget', 'tmp/sortedTarget');
+    grunt.file.copy('test/fixtures/nestedTarget', 'tmp/nestedTarget');
+    grunt.file.copy('test/fixtures/nestedSortedTarget', 'tmp/nestedSortedTarget');
   });
 
   // Whenever the "test" task is run, first clean the "tmp" dir, copy empty target, then run this

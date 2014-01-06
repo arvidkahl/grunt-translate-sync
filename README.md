@@ -101,7 +101,9 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 
 ## Release History
 0.1.0 - Initial Version, keys are added after the last key if not present in target files
-	
+
 0.2.0 - keepKeyOrder option introduced, testing refined for both cases
 
 0.2.1 - added travis integration
+
+0.3.0 - added namespace compatibility (fixes #1 )

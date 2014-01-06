@@ -40,4 +40,18 @@ exports.translate_sync = {
     test.deepEqual(actual, expected, 'should have the same keys (in correct order).');
     test.done();
   },
+  nested: function(test) {
+    test.expect(1);
+    var actual = JSON.parse(grunt.file.read('tmp/nestedTarget'));
+    var expected = JSON.parse(grunt.file.read('test/expected/nested'));
+    test.deepEqual(actual, expected, 'should have the same keys with namespaces.');
+    test.done();
+  },
+  nestedSorted: function(test) {
+    test.expect(1);
+    var actual = JSON.parse(grunt.file.read('tmp/nestedSortedTarget'));
+    var expected = JSON.parse(grunt.file.read('test/expected/nestedSorted'));
+    test.deepEqual(actual, expected, 'should have the same keys (in correct order) with namespaces.');
+    test.done();
+  },
 };

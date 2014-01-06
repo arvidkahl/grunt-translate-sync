@@ -1,0 +1,6 @@
+{
+  "first key": "first value",
+  "first namespace" : {
+    "first namespace key": "i am taken"
+  }
+}

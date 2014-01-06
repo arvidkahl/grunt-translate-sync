@@ -1,0 +1,12 @@
+{
+  "second key": "second value",
+  "third key": "third value",
+  "first namespace" : {
+    "first namespace key": "i am taken",
+    "second namespace key": "second namespace value",
+    "first namespace subnamespace": {
+      "first key": "first value"
+    }
+  },
+  "first key": "first value"
+}
