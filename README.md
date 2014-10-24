@@ -31,7 +31,8 @@ grunt.initConfig({
   translate_sync: {
     options: {
       keepKeyOrder: Boolean,
-      indent: String or Number
+      indent: String or Number,
+      warnOnIdenticalValues: Boolean
     },
     source: String,
     targets: [String]
@@ -53,11 +54,17 @@ Default value: `2`
 
 A string or numeric value that is passed to JSON.stringify as the `space` parameter when writing the target files. Setting it to `null` will remove pretty-printing, anything else will pretty-pring the JSON as outlined in [the JSON.stringify documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify)
 
+#### options.warnOnIdenticalValues
+Type: `boolean`
+Default value: `true`
+
+Usually, different files will hold identical keys with different values. If this option is switched on, the task will report keys where the source and the target values are equal. This happens when a key has not yet been translated into the target language.
+
 #### source
 Type: `String`
 Default value: `null`
 
-Required value of the path to the source file. All key-value pair in this file will be added to all target files unless they are already present there. Must be valid JSON.
+Required value of the path to the source file. All key-value pairs in this file will be added to all target files unless they are already present there. Must be valid JSON.
 
 #### targets
 Type: `[String]`
@@ -68,7 +75,7 @@ Required array of target files that should be updated with the keys from the sou
 ### Usage Example
 
 #### Default Options
-In this example, a source file called `tmp/enUS.json` will be used to update the key-value pairs in `tmp/frFR` and `tmp/deDE`.
+In this example, a source file called `tmp/enUS.json` will be used to update the key-value pairs in `tmp/frFR.json` and `tmp/deDE.json`.
 
 ```js
 grunt.initConfig({
@@ -80,14 +87,15 @@ grunt.initConfig({
 ```
 
 #### Custom Options
-In this example, a source file called `tmp/enUS.json` will be used to update the key-value pairs in `tmp/frFR` and `tmp/deDE`, keeping the key order in the target files as they are (new keys will be added after the last key), and using a `tab` character for pretty-printing.
+In this example, a source file called `tmp/enUS.json` will be used to update the key-value pairs in `tmp/frFR` and `tmp/deDE`, keeping the key order in the target files as they are (new keys will be added after the last key), and using a `tab` character for pretty-printing. Warnings about identical values will be supressed.
 
 ```js
 grunt.initConfig({
   translate_sync: {
     options: {
       keepKeyOrder: false,
-      indent: "\t"
+      indent: "\t",
+      warnOnIdenticalValues: false
     },
     source: "tmp/enUS.json",
     targets: ["tmp/frFR.json", "tmp/deDE.json"]
@@ -107,3 +115,5 @@ In lieu of a formal styleguide, take care to maintain the existing coding style.
 0.2.1 - added travis integration
 
 0.3.0 - added namespace compatibility, fixes arvidkahl/grunt-translate-sync#1
+
+0.3.1 - fixed behavior with empty string values, fixed issues with invalid JSON in the source/target files and added the warnOnIdenticalValues option. refactored the comparison function to be readable

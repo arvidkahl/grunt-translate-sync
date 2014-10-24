@@ -6,9 +6,9 @@
  * Licensed under the MIT license.
  */
 
-'use strict';
+ 'use strict';
 
-module.exports = function(grunt) {
+ module.exports = function(grunt) {
 
   // Please see the Grunt documentation for more information regarding task
   // creation: http://gruntjs.com/creating-tasks
@@ -19,100 +19,132 @@ module.exports = function(grunt) {
     var changedItems = 0;
 
     var options = this.options({
-       indent : 2,
-       keepKeyOrder : true
-    });
+     indent : 2,
+     keepKeyOrder : true,
+     warnOnIdenticalValues : true
+   });
 
     var done = this.async();
 
-    assureObjectEquality = function(s, t) {
-      var sourceKey, sourceValue, t_, _ref;
-      if (t == null) {
-        t = {};
+    assureObjectEquality = function(sourceObject, targetObject) {
+      var sourceKey, sourceValue, tempTargetObject, _ref;
+      if (targetObject == null) {
+        targetObject = {};
       }
-      t_ = {};
-      for (sourceKey in s) {
-        sourceValue = s[sourceKey];
+      tempTargetObject = {};
+      for (sourceKey in sourceObject) {
+        sourceValue = sourceObject[sourceKey];
         if ((_ref = typeof sourceValue) === "string" || _ref === "boolean" || _ref === "number") {
-          if (!t[sourceKey]) {
-            changedItems++;
-            t_[sourceKey] = sourceValue;
-            t[sourceKey] = sourceValue;
+          // if (!t[sourceKey]) {
+            if ((typeof targetObject[sourceKey] === 'undefined')) {
+              tempTargetObject[sourceKey] = sourceValue;
+              targetObject[sourceKey] = sourceValue;
+              grunt.log.writeln("[New key added]:\t'"+sourceKey+"'");
+              changedItems++;
+            } else {
+
+              if (options.warnOnIdenticalValues && sourceValue === targetObject[sourceKey]) {
+                grunt.log.writeln("[Identical Values]:\t"+sourceKey+".");
+              }
+
+              tempTargetObject[sourceKey] = targetObject[sourceKey];
+            }
           } else {
-            t_[sourceKey] = t[sourceKey];
+            if (!targetObject[sourceKey]) {
+              targetObject[sourceKey] = {};
+              tempTargetObject[sourceKey] = {};
+            }
+            targetObject[sourceKey] = assureObjectEquality(sourceValue, targetObject[sourceKey]);
+            tempTargetObject[sourceKey] = assureObjectEquality(sourceValue, targetObject[sourceKey]);
           }
-        } else {
-          if (!t[sourceKey]) {
-            t[sourceKey] = {};
-            t_[sourceKey] = {};
-          }
-          t[sourceKey] = assureObjectEquality(sourceValue, t[sourceKey]);
-          t_[sourceKey] = assureObjectEquality(sourceValue, t[sourceKey]);
         }
+        if (options.keepKeyOrder) {
+          targetObject = tempTargetObject;
+        }
+        return targetObject;
+      };
+
+
+      var sourceJSON;
+      var sourceFile = this.data.source;
+      var targetFiles = this.data.targets;
+      if (sourceFile==null) {
+        grunt.log.warn('Source option not found.');
+        return false;
       }
-      if (options.keepKeyOrder) {
-        t = t_;
+
+      if (!grunt.file.exists(sourceFile)) {
+        grunt.log.warn('Source file "' + sourceFile + '" not found.');
+        return false;
       }
-      return t;
-    };
+
+      grunt.log.writeln('Using source file "' + sourceFile);
+      try {
+        sourceJSON = JSON.parse(grunt.file.read(sourceFile));
+      }
+      catch (e) {
+        grunt.log.error('Source file contains malformed JSON');
+        return false;
+      }
 
 
-    var sourceFile = this.data.source;
-    var targetFiles = this.data.targets;
+      if (targetFiles==null) {
+        grunt.log.warn('Targets option not found');
+        return false;
+      }
+      var targetCount = targetFiles.length;
+      if (targetCount===0) {
+        grunt.log.warn('No targets specified');
+        return false;
+      }
 
-    if (sourceFile==null) {
-      grunt.log.warn('Source option not found.');
-      return false;
-    }
-
-    if (!grunt.file.exists(sourceFile)) {
-      grunt.log.warn('Source file "' + sourceFile + '" not found.');
-      return false;
-    }
-
-    var sourceJSON = JSON.parse(grunt.file.read(sourceFile));
-    grunt.log.writeln('Using source file "' + sourceFile);
-
-
-    if (targetFiles==null) {
-      grunt.log.warn('Targets option not found');
-      return false;
-    }
-    var targetCount = targetFiles.length;
-    if (targetCount===0) {
-      grunt.log.warn('No targets specified');
-      return false;
-    }
-
-    var remainingCount = targetCount;
+      var remainingCount = targetCount;
+      var hasErrors = false;
 
     // Iterate over all specified file groups.
+
     targetFiles.forEach(function(filepath) {
 
       // Warn on and remove invalid source files (if nonull was set).
       if (!grunt.file.exists(filepath)) {
         grunt.log.warn('Target file "' + filepath + '" not found.');
-        return false;
+        hasErrors = true;
+
       } else {
         // Read file source.
         var targetContent = grunt.file.read(filepath);
-        var targetJSON = JSON.parse(targetContent);
-        var result;
+        var targetJSON;
+        try {
+          targetJSON = JSON.parse(targetContent);
+        }
+        catch (e) {
+          grunt.log.error('Target file "'+filepath+'" contains malformed JSON');
+          hasErrors = true;
+        }
 
-        result = assureObjectEquality(sourceJSON, targetJSON);
+        if (!hasErrors && sourceJSON && targetJSON) {
 
-        grunt.log.writeln('File "' + filepath + '" updated. '+changedItems+' items changed.');
-        grunt.file.write(filepath, JSON.stringify(result, null, options.indent));
+          var result;
+          result = assureObjectEquality(sourceJSON, targetJSON);
+
+          grunt.log.writeln('File "' + filepath + '" updated. '+changedItems+' items changed.');
+          grunt.file.write(filepath, JSON.stringify(result, null, options.indent));
+
+        }
+
         if (--remainingCount===0) {
-          done();
+          if (hasErrors) {
+            grunt.log.writeln('Did not sync files.');
+            done(false);
+          } else {
+            // Print a success message.
+            grunt.log.writeln('Done syncing files.');
+            done(true);
+
+          }
         }
       }
     });
-
-
-    // Print a success message.
-    grunt.log.writeln('Done syncing files.');
-
-  });
+});
 
 };
